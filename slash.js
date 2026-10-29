@@ -26,24 +26,54 @@
   const cuts = [];
   let lastCut = 0;
 
-  addEventListener("pointermove", e => {
-    const now = performance.now();
-    pts.push({ x: e.clientX, y: e.clientY, t: now });
-    detect(now);
+  // 손가락은 마우스보다 느리고 화면이 작아서 기준을 낮춤
+  const touchMin = () => Math.min(SLASH_MIN, Math.min(innerWidth, innerHeight) * 0.3);
+  let down = null, cutThisStroke = false;
+
+  addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse") return;
+    pts.length = 0; // 앞선 터치와 이어지지 않게
+    down = { x: e.clientX, y: e.clientY, t: performance.now() };
+    cutThisStroke = false;
   }, { passive: true });
 
-  function detect(now) {
+  addEventListener("pointermove", e => {
+    const touch = e.pointerType !== "mouse";
+    // 휴대폰은 이벤트가 듬성듬성 와서 사이 좌표까지 모음
+    const list = e.getCoalescedEvents?.() || [];
+    for (const c of list.length ? list : [e]) pts.push({ x: c.clientX, y: c.clientY, t: c.timeStamp || performance.now() });
+    detect(e.timeStamp || performance.now(), touch);
+  }, { passive: true });
+
+  // 빠르게 튕긴 짧은 터치는 움직이는 동안 기준을 못 넘기도 해서, 손을 뗄 때 한 번 더 판정
+  const release = e => {
+    if (e.pointerType === "mouse" || !down) return;
+    const now = performance.now(), b = { x: e.clientX, y: e.clientY, t: now };
+    const dist = Math.hypot(b.x - down.x, b.y - down.y);
+    if (!cutThisStroke && now - lastCut >= 650 && dist >= touchMin() && now - down.t < 450) {
+      lastCut = now;
+      slash(down, b, now);
+    }
+    down = null;
+  };
+  addEventListener("pointerup", release, { passive: true });
+  addEventListener("pointercancel", release, { passive: true });
+
+  function detect(now, touch) {
     if (now - lastCut < 650) return;
+    const min = touch ? touchMin() : SLASH_MIN;
+    const speedMin = touch ? 0.9 : SLASH_SPEED;
     const recent = pts.filter(p => now - p.t < 90);
-    if (recent.length < 3) return;
+    if (recent.length < 2) return;
     const a = recent[0], b = recent[recent.length - 1];
     const dist = Math.hypot(b.x - a.x, b.y - a.y);
-    if (dist < SLASH_MIN * 0.5 || dist / (b.t - a.t || 1) < SLASH_SPEED) return;
+    if (dist < min * 0.4 || dist / (b.t - a.t || 1) < speedMin) return;
     // 같은 방향으로 이어진 구간 전체를 베기 길이로
-    const stroke = pts.filter(p => now - p.t < 220);
+    const stroke = pts.filter(p => now - p.t < 260);
     const s = stroke[0];
-    if (Math.hypot(b.x - s.x, b.y - s.y) < SLASH_MIN) return;
+    if (Math.hypot(b.x - s.x, b.y - s.y) < min) return;
     lastCut = now;
+    cutThisStroke = true;
     slash(s, b, now);
   }
 
