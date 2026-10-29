@@ -70,20 +70,16 @@ body {
   transition: background .2s, color .2s;
 }
 .contact:hover, .contact:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
-/* 가만히 있으면 가끔 눈 깜빡이듯: 위아래 눈꺼풀이 가운데로 닫혔다 열림 */
+/* 가만히 있으면 가끔 눈 깜빡이듯: 검은 윗눈꺼풀이 속눈썹과 함께 내려왔다 올라감 */
 .contact { overflow: hidden; }
-.contact::before, .contact::after {
-  content: ""; position: absolute; left: 0; right: 0; height: 50%;
-  background: var(--bg); pointer-events: none; transform: translateY(-101%);
+.contact::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0 0H100V52Q50 74 0 52Z' fill='%231b1b1b'/><g stroke='%231b1b1b' stroke-width='1.3' stroke-linecap='round' fill='none' vector-effect='non-scaling-stroke'><path d='M30 62Q27 76 22 88' vector-effect='non-scaling-stroke'/><path d='M40 65Q38 80 35 93' vector-effect='non-scaling-stroke'/><path d='M50 66V95' vector-effect='non-scaling-stroke'/><path d='M60 65Q62 80 65 93' vector-effect='non-scaling-stroke'/><path d='M70 62Q73 76 78 88' vector-effect='non-scaling-stroke'/></g></svg>") center / 100% 100% no-repeat;
+  transform: translateY(-101%);
 }
-.contact::before { top: 0; border-bottom: 1px solid var(--ink); }
-.contact::after { bottom: 0; border-top: 1px solid var(--ink); transform: translateY(101%); }
-.contact.blink::before { animation: lid-top .22s ease-in-out; }
-.contact.blink::after { animation: lid-bottom .22s ease-in-out; }
-.contact.blink2::before { animation: lid-top .22s ease-in-out, lid-top .22s ease-in-out .3s; }
-.contact.blink2::after { animation: lid-bottom .22s ease-in-out, lid-bottom .22s ease-in-out .3s; }
-@keyframes lid-top { 0%, 100% { transform: translateY(-101%); } 45%, 60% { transform: translateY(0); } }
-@keyframes lid-bottom { 0%, 100% { transform: translateY(101%); } 45%, 60% { transform: translateY(0); } }
+.contact.blink::before { animation: lid .24s ease-in-out; }
+.contact.blink2::before { animation: lid .24s ease-in-out, lid .24s ease-in-out .32s; }
+@keyframes lid { 0%, 100% { transform: translateY(-101%); } 45%, 60% { transform: translateY(0); } }
 
 /* 떠다니는 글자 */
 .ch { display: inline-block; white-space: pre; }
