@@ -100,110 +100,6 @@
         blue: Math.random() < 0.3,
       });
     }
-    spew(now);
-  }
-
-  // ME 위쪽에서 만화 토사물처럼 초록 물줄기가 짧게 뿜어져 나옴
-  const GOO = "#9ccc3c", GOO_LIGHT = "#d4ec7e", GOO_DARK = "#6e9a22", LINE = "#1b1b1b";
-  let gush = null;
-  const drops = [];
-  function spew(now) {
-    const chars = [...document.querySelectorAll(".page:not(.half) #mark .ch")].filter(c => c.textContent.trim());
-    const me = chars.slice(-2);
-    if (me.length < 2) return;
-    const r1 = me[0].getBoundingClientRect(), r2 = me[1].getBoundingClientRect();
-    const k = Math.max(0.55, Math.min(1.6, (r2.right - r1.left) / 190)); // ME 폭에 맞춘 크기
-    const o = { x: r1.left + (r2.right - r1.left) * 0.45, y: Math.min(r1.top, r2.top) + (r2.bottom - r2.top) * 0.1 };
-    // 위로 조금 솟았다가 왼쪽으로 넓게 휘어 아래로 쏟아지는 곡선
-    const P = [o, { x: o.x - 10 * k, y: o.y - 130 * k }, { x: o.x - 190 * k, y: o.y - 150 * k }, { x: o.x - 240 * k, y: o.y + 30 * k }];
-    gush = { P, k, t: now, dy: 0, vy: 0, ph: Math.random() * 6 };
-    // 입에서 처음 튀는 방울
-    for (let i = 0; i < 5; i++) drops.push({ x: o.x, y: o.y, vx: (Math.random() - 0.3) * 0.35, vy: -0.25 - Math.random() * 0.3, r: (2 + Math.random() * 3) * k, t: now });
-  }
-  const bez = (P, f) => {
-    const g = 1 - f;
-    return {
-      x: g * g * g * P[0].x + 3 * g * g * f * P[1].x + 3 * g * f * f * P[2].x + f * f * f * P[3].x,
-      y: g * g * g * P[0].y + 3 * g * g * f * P[1].y + 3 * g * f * f * P[2].y + f * f * f * P[3].y,
-    };
-  };
-  // 물줄기 몸통(울퉁불퉁한 폭) + 둥근 끝 + 아래로 늘어지는 방울 손가락, 조각마다 따로 그림
-  function goo(list, wAt) {
-    const L = [], R = [], n = list.length - 1;
-    for (let i = 0; i <= n; i++) {
-      const p = list[i], q = list[Math.min(i + 1, n)], o = list[Math.max(i - 1, 0)];
-      const dx = q.x - o.x, dy = q.y - o.y, d = Math.hypot(dx, dy) || 1;
-      const w = wAt(i / n);
-      L.push([p.x - dy / d * w, p.y + dx / d * w]);
-      R.push([p.x + dy / d * w, p.y - dx / d * w]);
-    }
-    const body = new Path2D();
-    body.moveTo(...L[0]);
-    L.forEach(q => body.lineTo(...q));
-    R.reverse().forEach(q => body.lineTo(...q));
-    body.closePath();
-    const parts = [body];
-    const e = list[n], f = list[Math.max(0, n - 2)], ew = wAt(1);
-    const dx = e.x - f.x, dy = e.y - f.y, d = Math.hypot(dx, dy) || 1, nx = -dy / d, ny = dx / d;
-    const cap = new Path2D(); cap.ellipse(e.x, e.y, ew, ew * 0.9, 0, 0, Math.PI * 2); parts.push(cap);
-    for (const [side, len] of [[-0.62, 0.9], [-0.15, 1.5], [0.35, 1.15], [0.75, 0.7]]) {
-      const drip = new Path2D();
-      drip.ellipse(e.x + nx * ew * side, e.y + ny * ew * side + ew * len * 0.55, ew * 0.3, ew * len * 0.75, 0, 0, Math.PI * 2);
-      parts.push(drip);
-    }
-    return parts;
-  }
-  function drawGush(now, dt) {
-    if (gush) {
-      const age = now - gush.t, { P, k } = gush;
-      const head = Math.min(1, age / 170);                         // 0.17초 동안 뻗어 나감
-      const tail = age < 340 ? 0 : Math.min(1, (age - 340) / 260); // 그다음 입에서 떨어져 쏟아짐
-      if (age > 340) { gush.vy += 0.0025 * dt; gush.dy += gush.vy * dt; }
-      if (tail >= 1) gush = null;
-      else {
-        const list = [];
-        for (let i = 0; i <= 32; i++) {
-          const p = bez(P, tail + (head - tail) * i / 32);
-          list.push({ x: p.x, y: p.y + gush.dy * (i / 32) });
-        }
-        const ph = gush.ph;
-        const wAt = f => { const g = tail + (head - tail) * f; return (4 + 26 * g * g) * k * (1 + 0.16 * Math.sin(g * 22 + ph)); };
-        // 굵은 검은 테두리를 먼저, 그 위에 초록을 채워 한 덩어리처럼
-        const parts = goo(list, wAt);
-        ctx.lineWidth = 4.5; ctx.lineJoin = "round"; ctx.strokeStyle = LINE;
-        parts.forEach(q => ctx.stroke(q));
-        ctx.fillStyle = GOO;
-        parts.forEach(q => ctx.fill(q));
-        // 어두운 얼룩과 밝은 결
-        ctx.fillStyle = GOO_DARK;
-        for (let j = 0; j < 6; j++) {
-          const f = 0.3 + j * 0.11; if (f > head - tail) break;
-          const p = list[Math.round(f * 32)], w = wAt(f);
-          ctx.beginPath(); ctx.ellipse(p.x + Math.sin(j * 2.3 + ph) * w * 0.35, p.y + Math.cos(j * 1.7) * w * 0.3, w * 0.22, w * 0.13, j, 0, Math.PI * 2); ctx.fill();
-        }
-        ctx.strokeStyle = GOO_LIGHT; ctx.lineWidth = 2.5 * k; ctx.lineCap = "round";
-        ctx.beginPath();
-        list.slice(2, -4).forEach((p, i) => { const y = p.y - wAt(i / 32) * 0.5; i ? ctx.lineTo(p.x, y) : ctx.moveTo(p.x, y); });
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-        // 물줄기 끝에서 방울이 떨어짐
-        if (age < 420 && Math.random() < dt / 30) {
-          const e = list[list.length - 1];
-          drops.push({ x: e.x + (Math.random() - 0.5) * 30 * k, y: e.y, vx: (Math.random() - 0.6) * 0.15, vy: Math.random() * 0.1, r: (2 + Math.random() * 4) * k, t: now });
-        }
-      }
-    }
-    for (let i = drops.length - 1; i >= 0; i--) {
-      const d = drops[i], age = now - d.t;
-      if (age > 700 || d.y > H + 20) { drops.splice(i, 1); continue; }
-      d.vy += 0.0018 * dt; d.x += d.vx * dt; d.y += d.vy * dt;
-      ctx.globalAlpha = Math.min(1, (700 - age) / 200);
-      ctx.beginPath();
-      ctx.ellipse(d.x, d.y, d.r * 0.8, d.r * 1.15, 0, 0, Math.PI * 2);
-      ctx.fillStyle = GOO; ctx.fill();
-      ctx.lineWidth = 1.6; ctx.strokeStyle = LINE; ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
   }
 
   const bits = [];
@@ -295,7 +191,6 @@
     lastFrame = now;
     ctx.clearRect(0, 0, W, H);
     drawBits(now, dt);
-    drawGush(now, dt);
     while (pts.length && now - pts[0].t > TRAIL_MS) pts.shift();
     // 칼자국 길이는 최대 260px
     let run = 0;
