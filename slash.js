@@ -2,7 +2,6 @@
 (() => {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  const INK = "#1b1b1b";
   const TRAIL_MS = 140;      // 칼자국이 남는 시간
   const SLASH_SPEED = 2.2;   // px/ms — 이보다 빠르면 '베기'
   const SLASH_MIN = 180;     // 베기로 치는 최소 길이(px)
@@ -92,30 +91,38 @@
     endTimer = setTimeout(heal, 760);
   }
 
-  // 붓처럼 가운데가 굵고 양끝이 가는 칼자국
-  function stroke(list, maxW, alpha) {
-    if (list.length < 2) return;
+  // 애니 swoosh 한 줄: 파란 초승달 + 한쪽으로 치우친 밝은 심. 끝은 뾰족, 머리 쪽이 굵음
+  const BLUE = "#1f6bff", CORE = "#8fe9ff";
+  function band(list, maxW, shift, color) {
     const left = [], right = [];
-    for (let i = 0; i < list.length; i++) {
-      const p = list[i], q = list[Math.min(i + 1, list.length - 1)], o = list[Math.max(i - 1, 0)];
+    const n = list.length - 1;
+    for (let i = 0; i <= n; i++) {
+      const p = list[i], q = list[Math.min(i + 1, n)], o = list[Math.max(i - 1, 0)];
       const dx = q.x - o.x, dy = q.y - o.y, d = Math.hypot(dx, dy) || 1;
-      const w = maxW * Math.sin(Math.PI * i / (list.length - 1)) * 0.5;
-      left.push([p.x - dy / d * w, p.y + dx / d * w]);
-      right.push([p.x + dy / d * w, p.y - dx / d * w]);
+      const f = i / n;
+      const w = maxW * Math.pow(Math.sin(Math.PI * f), 0.8) * (0.35 + 0.65 * f) * 0.5;
+      const nx = -dy / d, ny = dx / d, c = w * shift;
+      left.push([p.x + nx * (c - w), p.y + ny * (c - w)]);
+      right.push([p.x + nx * (c + w), p.y + ny * (c + w)]);
     }
     ctx.beginPath();
     ctx.moveTo(...left[0]);
     left.forEach(q => ctx.lineTo(...q));
     right.reverse().forEach(q => ctx.lineTo(...q));
     ctx.closePath();
-    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
     ctx.fill();
+  }
+  function stroke(list, maxW, alpha) {
+    if (list.length < 2) return;
+    ctx.globalAlpha = alpha;
+    band(list, maxW, 0, BLUE);
+    band(list, maxW * 0.45, 0.9, CORE);
     ctx.globalAlpha = 1;
   }
 
   function frame(now) {
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = INK;
     while (pts.length && now - pts[0].t > TRAIL_MS) pts.shift();
     // 칼자국 길이는 최대 260px
     let run = 0;
@@ -127,7 +134,7 @@
     if (pts.length > 2) {
       const a = pts[0], b = pts[pts.length - 1];
       const speed = Math.hypot(b.x - a.x, b.y - a.y) / (b.t - a.t || 1);
-      if (speed > 0.5) stroke(pts, Math.min(2 + speed * 3.5, 14), Math.min(1, speed / 1.5));
+      if (speed > 0.5) stroke(pts, Math.min(3 + speed * 4, 16), Math.min(1, speed / 1.5));
     }
     for (let i = cuts.length - 1; i >= 0; i--) {
       const c = cuts[i], age = now - c.t;
@@ -137,8 +144,14 @@
       const fade = age < 90 ? 1 : 1 - (age - 90) / 430;
       const end = { x: c.from.x + (c.to.x - c.from.x) * grow, y: c.from.y + (c.to.y - c.from.y) * grow };
       const steps = 24, line = [];
-      for (let k = 0; k <= steps; k++) line.push({ x: c.from.x + (end.x - c.from.x) * k / steps, y: c.from.y + (end.y - c.from.y) * k / steps });
-      stroke(line, 7 * fade, fade);
+      // 살짝 휘어진 호(초승달 swoosh)
+      const lx = end.x - c.from.x, ly = end.y - c.from.y, bow = Math.hypot(lx, ly) * 0.07;
+      const ln = Math.hypot(lx, ly) || 1;
+      for (let k = 0; k <= steps; k++) {
+        const f = k / steps, b = Math.sin(Math.PI * f) * bow;
+        line.push({ x: c.from.x + lx * f - ly / ln * b, y: c.from.y + ly * f + lx / ln * b });
+      }
+      stroke(line, 10 * fade, fade);
     }
     requestAnimationFrame(frame);
   }
