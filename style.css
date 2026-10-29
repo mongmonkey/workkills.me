@@ -1,0 +1,99 @@
+:root {
+  --bg: #f7f7f7;
+  --ink: #1b1b1b;
+  --red: #e1121b;
+  --side: clamp(20px, 4vw, 80px);
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  touch-action: pinch-zoom; /* 휴대폰에서 손가락으로 그어도 베기가 되게 */
+}
+
+.page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 var(--side) clamp(28px, 5vh, 56px);
+}
+
+.sub {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: clamp(14px, 2.4vw, 34px);
+  font: 400 clamp(14px, 1.15vw, 19px)/1.3 "EB Garamond", Garamond, Georgia, serif;
+  letter-spacing: .01em;
+}
+
+.mark {
+  font: 400 100px/0.8 "Gloock", "Times New Roman", serif;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+/* 글꼴 크기는 main.js가 화면 폭에 맞춤 */
+#mark, .half .mark > span { display: inline-block; }
+
+/* KILLS: 나타난 뒤 순식간에 빨갛게 번쩍였다가 검정으로 */
+.ready .page:not(.half) .kills { animation: kill-flash 1s 1.1s; }
+.half .kills { color: var(--red); }
+@keyframes kill-flash {
+  0%, 100% { color: var(--ink); }
+  6%, 55% { color: var(--red); }
+}
+
+.sub, .mark {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 1.2s ease, transform 1.2s cubic-bezier(.2,.7,0,1);
+}
+.ready .sub, .ready .mark { opacity: 1; transform: none; }
+.ready .sub { transition-delay: .35s; }
+
+.contact {
+  position: fixed;
+  top: clamp(16px, 2.4vw, 32px);
+  right: var(--side);
+  z-index: 20;
+  padding: 6px 14px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font: 400 14px/1 "EB Garamond", Garamond, Georgia, serif;
+  letter-spacing: .02em;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background .2s, color .2s;
+}
+.contact:hover, .contact:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
+
+/* 떠다니는 글자 */
+.ch { display: inline-block; white-space: pre; }
+
+.slash-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 베인 글자 조각 — 바탕 없이 글자만, 원래 글자는 잠깐 숨김 */
+.half {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  transition: transform .14s cubic-bezier(.1,.9,.2,1);
+  will-change: transform;
+}
+.half.mend { transition: transform .45s cubic-bezier(.6,0,.2,1); }
+.page.cutting .sub, .page.cutting .mark { visibility: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sub, .mark { transition: none; transform: none; }
+}
