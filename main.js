@@ -37,6 +37,27 @@ document.fonts.ready.then(() => {
 });
 addEventListener("resize", fit);
 
+// Contact 버튼: 가만히 있으면 3~7초마다 눈 깜빡이듯(가끔 두 번)
+const contact = document.querySelector(".contact");
+if (!reduce) {
+  let lastInput = performance.now();
+  const touch = () => { lastInput = performance.now(); };
+  addEventListener("pointermove", touch, { passive: true });
+  addEventListener("keydown", touch);
+  const blink = () => {
+    const idle = performance.now() - lastInput > 1500;
+    if (idle && !contact.matches(":hover, :focus-visible")) {
+      const cls = Math.random() < 0.3 ? "blink2" : "blink";
+      contact.classList.remove("blink", "blink2");
+      void contact.offsetWidth;
+      contact.classList.add(cls);
+      setTimeout(() => contact.classList.remove(cls), 600);
+    }
+    setTimeout(blink, 3000 + Math.random() * 4000);
+  };
+  setTimeout(blink, 2500);
+}
+
 // 가만히 있으면 글자들이 슬쩍슬쩍 떠다니고, 움직이면 제자리로
 function drift() {
   const chars = [...document.querySelectorAll(".page:not(.half) .ch")].map((el, i) => ({

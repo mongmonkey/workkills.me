@@ -70,6 +70,10 @@ body {
   transition: background .2s, color .2s;
 }
 .contact:hover, .contact:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
+/* 가만히 있으면 가끔 눈 깜빡이듯 위아래로 감았다 뜸 */
+.contact.blink { animation: blink .2s ease-in-out; }
+.contact.blink2 { animation: blink .2s ease-in-out, blink .2s ease-in-out .28s; }
+@keyframes blink { 0%, 100% { transform: scaleY(1); } 45%, 55% { transform: scaleY(.08); } }
 
 /* 떠다니는 글자 */
 .ch { display: inline-block; white-space: pre; }
