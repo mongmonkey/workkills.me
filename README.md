@@ -16,7 +16,16 @@ cd ~/Downloads/workkills && python3 -m http.server 8137
 - 글꼴: Google Fonts의 Gloock(워드마크)·EB Garamond(서브 텍스트).
 - 색: `style.css` 맨 위 `--bg`, `--ink`.
 
-## 배포 (추천: Cloudflare Pages, 무료)
+## 지금 배포 상태 (2026-10-29)
+
+- GitHub Pages: 저장소 `mongmonkey/workkills.me`, `main` 브랜치 루트, 사용자 도메인 `workkills.me`(`CNAME` 파일).
+- 고치고 올리기: `git add -A && git commit -m "…" && git push` → 1분쯤 뒤 반영.
+- 도메인: GoDaddy. DNS 레코드
+  - A `@` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` (GoDaddy 기본 A 레코드는 삭제)
+  - CNAME `www` → `mongmonkey.github.io`
+- DNS가 잡히면 저장소 Settings → Pages에서 "Enforce HTTPS" 켜기.
+
+## 다른 배포 방법 (Cloudflare Pages, 무료)
 
 1. GitHub에 이 폴더를 새 저장소로 올린다 (또는 Cloudflare 대시보드에서 폴더를 직접 업로드 — "Upload assets").
 2. Cloudflare 대시보드 → Workers & Pages → Create → Pages → 저장소 연결.
