@@ -85,6 +85,40 @@
     const reach = Math.min(len * 0.7, Math.max(W, H) * 0.45);
     cuts.push({ from: { x: mid.x - u.x * reach, y: mid.y - u.y * reach }, to: { x: mid.x + u.x * reach, y: mid.y + u.y * reach }, t: now });
     split(mid, u, Math.hypot(W, H) * 2);
+    // 베인 선을 따라 작은 파편이 양쪽으로 살짝 튐
+    const n = { x: -u.y, y: u.x };
+    for (let i = 0; i < 16; i++) {
+      const along = (Math.random() * 2 - 1) * reach * 0.8;
+      const side = Math.random() < 0.5 ? -1 : 1;
+      const sp = 0.08 + Math.random() * 0.22;              // px/ms
+      const fwd = (Math.random() * 0.6 + 0.2) * sp;         // 휘두른 방향으로 조금 끌려감
+      bits.push({
+        x: mid.x + u.x * along, y: mid.y + u.y * along,
+        vx: n.x * side * sp + u.x * fwd, vy: n.y * side * sp + u.y * fwd - 0.05,
+        r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.03,
+        s: 2 + Math.random() * 4, t: now, life: 420 + Math.random() * 380,
+        blue: Math.random() < 0.3,
+      });
+    }
+  }
+
+  const bits = [];
+  function drawBits(now, dt) {
+    for (let i = bits.length - 1; i >= 0; i--) {
+      const b = bits[i], age = now - b.t;
+      if (age > b.life) { bits.splice(i, 1); continue; }
+      b.vy += 0.0006 * dt; // 아주 약한 중력
+      b.x += b.vx * dt; b.y += b.vy * dt; b.r += b.vr * dt;
+      ctx.save();
+      ctx.translate(b.x, b.y); ctx.rotate(b.r);
+      ctx.globalAlpha = 1 - age / b.life;
+      ctx.fillStyle = b.blue ? BLUE : "#1b1b1b";
+      // 가늘고 뾰족한 조각
+      ctx.beginPath();
+      ctx.moveTo(-b.s, 0); ctx.lineTo(0, -b.s * 0.35); ctx.lineTo(b.s * 0.8, b.s * 0.15); ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   let mendTimer, endTimer;
@@ -151,8 +185,12 @@
     ctx.globalAlpha = 1;
   }
 
+  let lastFrame = 0;
   function frame(now) {
+    const dt = Math.min(now - (lastFrame || now), 50);
+    lastFrame = now;
     ctx.clearRect(0, 0, W, H);
+    drawBits(now, dt);
     while (pts.length && now - pts[0].t > TRAIL_MS) pts.shift();
     // 칼자국 길이는 최대 260px
     let run = 0;
