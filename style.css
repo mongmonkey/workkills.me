@@ -70,10 +70,20 @@ body {
   transition: background .2s, color .2s;
 }
 .contact:hover, .contact:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
-/* 가만히 있으면 가끔 눈 깜빡이듯 위아래로 감았다 뜸 */
-.contact.blink { animation: blink .2s ease-in-out; }
-.contact.blink2 { animation: blink .2s ease-in-out, blink .2s ease-in-out .28s; }
-@keyframes blink { 0%, 100% { transform: scaleY(1); } 45%, 55% { transform: scaleY(.08); } }
+/* 가만히 있으면 가끔 눈 깜빡이듯: 위아래 눈꺼풀이 가운데로 닫혔다 열림 */
+.contact { overflow: hidden; }
+.contact::before, .contact::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 50%;
+  background: var(--bg); pointer-events: none; transform: translateY(-101%);
+}
+.contact::before { top: 0; border-bottom: 1px solid var(--ink); }
+.contact::after { bottom: 0; border-top: 1px solid var(--ink); transform: translateY(101%); }
+.contact.blink::before { animation: lid-top .22s ease-in-out; }
+.contact.blink::after { animation: lid-bottom .22s ease-in-out; }
+.contact.blink2::before { animation: lid-top .22s ease-in-out, lid-top .22s ease-in-out .3s; }
+.contact.blink2::after { animation: lid-bottom .22s ease-in-out, lid-bottom .22s ease-in-out .3s; }
+@keyframes lid-top { 0%, 100% { transform: translateY(-101%); } 45%, 60% { transform: translateY(0); } }
+@keyframes lid-bottom { 0%, 100% { transform: translateY(101%); } 45%, 60% { transform: translateY(0); } }
 
 /* 떠다니는 글자 */
 .ch { display: inline-block; white-space: pre; }
