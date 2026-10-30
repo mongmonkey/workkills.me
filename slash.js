@@ -139,11 +139,14 @@
       el.querySelectorAll("video").forEach(x => x.remove()); // 영상은 원본만 재생(자리는 .band가 유지)
       el.querySelectorAll(".sub, .band").forEach(x => { x.style.visibility = "hidden"; }); // 베기는 큰 글씨에만
       el.classList.add("half");
+      // 원본 페이지와 같은 자리·크기로 놓아 글씨가 위아래로 튀지 않게
+      const r = page.getBoundingClientRect();
+      Object.assign(el.style, { inset: "auto", top: r.top + "px", left: r.left + "px", width: r.width + "px", height: r.height + "px", minHeight: "0" });
       el.setAttribute("aria-hidden", "true");
       el.style.clipPath = `polygon(${[A, B, C, D].map(q => `${q.x}px ${q.y}px`).join(",")})`;
       document.body.append(el);
       // 두 조각이 베인 선을 따라 서로 반대로 미끄러지고 살짝 벌어짐
-      const slide = 16 * sign, gap = 4 * sign;
+      const slide = 5 * sign, gap = 2.5 * sign; // 글씨 자리가 크게 움직이지 않게 조금만
       void el.offsetWidth; // 시작 위치를 먼저 그려야 전환이 보임
       el.style.transform = `translate(${u.x * slide + n.x * gap}px, ${u.y * slide + n.y * gap}px)`;
       return el;
