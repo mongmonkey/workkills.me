@@ -17,6 +17,7 @@ const SPOTS = [      // 렌즈 중심, 그림 폭·높이 기준 0~1
 const MOVE = 750;    // 옮겨 가는 시간(ms)
 const SHAKE = 0.007; // 옮겨 갈 때 흔들림 크기(그림 폭 기준)
 const FLOAT = 0.006; // 늘 둥둥 떠 있는 움직임 크기(그림 폭 기준)
+const PULSE = 0.024; // 클릭할 때 순간 커지는 만큼 — 렌즈+이 값이 그림 높이(0.345)를 넘지 않게
 
 let img = { x: 0, y: 0, w: 0, h: 0 };
 let state = { u: SPOTS[0][0], v: SPOTS[0][1], d: LENS, jx: 0, jy: 0 };
@@ -37,8 +38,17 @@ function bob(now) {
 }
 
 // 렌즈가 그림 밖으로 나가지 않게 중심을 안쪽으로 당김(떠 있는 움직임 폭만큼 여유를 둠)
+// 클릭: 순간 커졌다(80ms) 천천히 돌아옴(450ms)
+let clickAt = -1e9;
+addEventListener("pointerdown", () => { clickAt = performance.now(); });
+function pulse(now) {
+  const t = now - clickAt;
+  if (t < 0 || t > 530) return 0;
+  return PULSE * (t < 80 ? Math.sin(t / 80 * Math.PI / 2) : 1 - ease((t - 80) / 450));
+}
+
 function draw(now = performance.now()) {
-  const D = state.d * img.w, r = D / 2, m = r + FLOAT * 1.4 * img.w;
+  const D = (state.d + pulse(now)) * img.w, r = D / 2, m = r + FLOAT * 1.4 * img.w;
   const [bx, by] = bob(now);
   const cx = Math.min(img.w - m, Math.max(m, state.u * img.w)) + (state.jx + bx) * img.w;
   const cy = Math.min(img.h - m, Math.max(m, state.v * img.h)) + (state.jy + by) * img.w;
