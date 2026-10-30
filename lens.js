@@ -1,13 +1,12 @@
 // 원형 렌즈: 무대 가운데 보이지 않는 그림(가로 2.9:1)을 깔고, 정해 둔 네 곳을 차례로 비춤
-// 다음 곳으로는 빠르게(살짝 흔들리며) 옮겨 가고, 각 곳에서는 렌즈를 키워 2~3초 머묾
+// 다음 곳으로는 빠르게(살짝 흔들리며) 옮겨 가고, 각 곳에서 2~3초 머묾
 const stage = document.querySelector(".band");
 const lens = stage.querySelector(".lens");
 const video = lens.querySelector("video");
 const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const RATIO = 2.9;   // 그림 가로:세로
-const SMALL = 0.23;  // 옮겨 갈 때 렌즈 지름(그림 폭 기준)
-const BIG = 0.32;    // 머물 때 렌즈 지름 — 그림 높이(0.345)보다 작아야 그림 밖이 안 보임
+const LENS = 0.32;   // 렌즈 지름(그림 폭 기준) — 그림 높이(0.345)보다 작아야 그림 밖이 안 보임
 const SPOTS = [      // 렌즈 중심, 그림 폭·높이 기준 0~1
   [0.148, 0.684],    // 왼쪽 망치 든 일꾼
   [0.491, 0.336],    // 가운데 밸브와 연기
@@ -18,7 +17,7 @@ const MOVE = 750;    // 옮겨 가는 시간(ms)
 const SHAKE = 0.007; // 옮겨 갈 때 흔들림 크기(그림 폭 기준)
 
 let img = { x: 0, y: 0, w: 0, h: 0 };
-let state = { u: SPOTS[0][0], v: SPOTS[0][1], d: BIG, jx: 0, jy: 0 };
+let state = { u: SPOTS[0][0], v: SPOTS[0][1], d: LENS, jx: 0, jy: 0 };
 
 function size() {
   const W = stage.clientWidth, H = stage.clientHeight;
@@ -51,7 +50,7 @@ function next() {
     state = {
       u: from[0] + (to[0] - from[0]) * k,
       v: from[1] + (to[1] - from[1]) * k,
-      d: BIG - (BIG - SMALL) * Math.min(1, mid * 1.6), // 떠날 때 줄고 도착하며 다시 커짐
+      d: LENS,
       // 손에 든 망원경처럼: 이동 중간에 가장 크게 흔들리고 도착하면 멎음
       jx: SHAKE * mid * (Math.sin(s * 23) + 0.6 * Math.sin(s * 41 + 1.3)),
       jy: SHAKE * mid * (Math.sin(s * 19 + 2.1) + 0.6 * Math.sin(s * 37)),
