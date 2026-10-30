@@ -41,9 +41,10 @@ body {
   overflow: hidden;
   background: #2a1d10 url("media/hero.jpg") center / cover;
 }
-.band video { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* 세로 화면: 남는 높이를 영상이 채움 */
-@media (max-width: 700px) { .band { flex: 1; min-height: 200px; max-height: none; } }
+.band { position: relative; }
+.band video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+/* 좁은 화면: 영상 하나를 가운데 기준으로 크롭해 남는 높이를 채움 */
+@media (max-width: 1024px) { .band { flex: 1; min-height: 200px; max-height: none; } }
 
 .mark {
   margin-top: auto;
