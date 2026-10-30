@@ -1,4 +1,5 @@
-// 원형 렌즈: 무대 가운데 보이지 않는 그림(가로 2.9:1)을 깔고, 정해 둔 네 곳을 차례로 비춤
+// 원형 렌즈: 무대 가운데 보이지 않는 그림(가로 2.9:1)을 깔고, 마우스를 따라 시점이 움직임
+// 마우스가 가만히 있으면(또는 터치 기기에서는) 정해 둔 네 곳을 차례로 비춤
 // 다음 곳으로는 빠르게(살짝 흔들리며) 옮겨 가고, 각 곳에서 2~3초 머묾
 const stage = document.querySelector(".band");
 const lens = stage.querySelector(".lens");
@@ -49,11 +50,14 @@ function draw(now = performance.now()) {
 }
 
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-let i = 0;
-function next() {
-  const from = SPOTS[i], to = SPOTS[i = (i + 1) % SPOTS.length];
+
+// 자동 둘러보기: 지금 자리에서 다음 곳으로 빠르게 옮겨 가 2~3초 머묾을 되풀이
+let i = 0, tour = 0, wait = 0;
+function go(to) {
+  const run = ++tour, from = [state.u, state.v];
   const t0 = performance.now(), seed = Math.random() * 100;
   (function step(now) {
+    if (run !== tour) return; // 마우스가 움직이면 멈춤
     const t = Math.min(1, (now - t0) / MOVE), k = ease(t), mid = Math.sin(Math.PI * t);
     const s = (now - t0) / 1000 + seed;
     state = {
@@ -65,14 +69,37 @@ function next() {
       jy: SHAKE * mid * (Math.sin(s * 19 + 2.1) + 0.6 * Math.sin(s * 37)),
     };
     if (t < 1) requestAnimationFrame(step);
-    else setTimeout(next, 2000 + Math.random() * 1000);
+    else wait = setTimeout(() => go(SPOTS[i = (i + 1) % SPOTS.length]), 2000 + Math.random() * 1000);
   })(t0);
+}
+
+// 마우스: 화면 전체를 그림 위 자리로 옮겨, 렌즈가 마우스를 부드럽게 따라옴
+// 3초 동안 안 움직이면 가장 가까운 곳으로 가서 다시 자동 둘러보기
+const IDLE = 3000, FOLLOW = 0.08;
+let aim = null, idleTimer = 0;
+addEventListener("pointermove", e => {
+  if (e.pointerType !== "mouse" || still) return;
+  tour++; clearTimeout(wait); clearTimeout(idleTimer);
+  aim = [e.clientX / innerWidth, e.clientY / innerHeight];
+  idleTimer = setTimeout(() => {
+    aim = null;
+    i = SPOTS.reduce((b, p, k) => Math.hypot(p[0] - state.u, p[1] - state.v) < Math.hypot(SPOTS[b][0] - state.u, SPOTS[b][1] - state.v) ? k : b, 0);
+    go(SPOTS[i]);
+  }, IDLE);
+}, { passive: true });
+
+function frame(now) {
+  if (aim) {
+    state = { u: state.u + (aim[0] - state.u) * FOLLOW, v: state.v + (aim[1] - state.v) * FOLLOW, d: LENS, jx: 0, jy: 0 };
+  }
+  draw(now);
+  requestAnimationFrame(frame);
 }
 
 size();
 addEventListener("resize", size);
 new ResizeObserver(size).observe(stage);
 if (!still) {
-  setTimeout(next, 2500);
-  (function loop(now) { draw(now); requestAnimationFrame(loop); })(performance.now());
+  wait = setTimeout(() => go(SPOTS[i = 1]), 2500);
+  requestAnimationFrame(frame);
 }
