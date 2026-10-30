@@ -137,6 +137,7 @@
       const el = page.cloneNode(true);
       el.querySelectorAll("[id]").forEach(x => x.removeAttribute("id"));
       el.querySelectorAll("video").forEach(x => x.remove()); // 영상은 원본만 재생(자리는 .band가 유지)
+      el.querySelectorAll(".sub, .band").forEach(x => { x.style.visibility = "hidden"; }); // 베기는 큰 글씨에만
       el.classList.add("half");
       el.setAttribute("aria-hidden", "true");
       el.style.clipPath = `polygon(${[A, B, C, D].map(q => `${q.x}px ${q.y}px`).join(",")})`;
