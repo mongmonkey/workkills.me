@@ -34,13 +34,16 @@ body {
 /* 가운데 영상 띠: 화면 폭 끝까지, 가로로 긴 비율로 잘라 보임 */
 .band {
   margin: 0 calc(-1 * var(--side));
-  aspect-ratio: 3.5 / 1;
+  /* 남는 높이만큼 키움: 폭의 1/3.5 ~ 1/3 사이 (위아래 크롭을 줄이되 스크롤은 안 생기게) */
+  flex: 1 1 0;
+  min-height: calc(100vw / 3.5);
+  max-height: calc(100vw / 3);
   overflow: hidden;
   background: #2a1d10 url("media/hero.jpg") center / cover;
 }
 .band video { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* 세로 화면: 남는 높이를 영상이 채움 */
-@media (max-width: 700px) { .band { aspect-ratio: auto; flex: 1; min-height: 200px; } }
+@media (max-width: 700px) { .band { flex: 1; min-height: 200px; max-height: none; } }
 
 .mark {
   margin-top: auto;
