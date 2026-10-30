@@ -126,7 +126,7 @@ body {
   will-change: transform;
 }
 .half.mend { transition: transform .45s cubic-bezier(.6,0,.2,1); }
-.page.cutting .mark { visibility: hidden; }
+.page.cutting .mark, .page.cutting .sub { visibility: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   .sub, .mark, .band { transition: none; transform: none; }

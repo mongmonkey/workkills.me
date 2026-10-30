@@ -1,5 +1,5 @@
 // 원형 렌즈: 무대 가운데 보이지 않는 그림(가로 2.9:1)을 깔고, 마우스를 따라 시점이 움직임
-// 마우스가 가만히 있으면(또는 터치 기기에서는) 정해 둔 네 곳을 차례로 비춤
+// 마우스나 손가락이 가만히 있으면 정해 둔 네 곳을 차례로 비춤
 // 다음 곳으로는 빠르게(살짝 흔들리며) 옮겨 가고, 각 곳에서 2~3초 머묾
 const stage = document.querySelector(".band");
 const lens = stage.querySelector(".lens");
@@ -84,19 +84,36 @@ function go(to) {
 }
 
 // 마우스: 화면 전체를 그림 위 자리로 옮겨, 렌즈가 마우스를 부드럽게 따라옴
+// 터치: 영상 무대 안에서 손가락을 대고 끌면 렌즈가 손가락 아래로 따라옴(큰 글씨 쪽 베기와 안 겹치게)
 // 3초 동안 안 움직이면 가장 가까운 곳으로 가서 다시 자동 둘러보기
 const IDLE = 3000, FOLLOW = 0.08;
-let aim = null, idleTimer = 0;
-addEventListener("pointermove", e => {
-  if (e.pointerType !== "mouse" || still) return;
+let aim = null, idleTimer = 0, finger = null;
+function steer(u, v) {
   tour++; clearTimeout(wait); clearTimeout(idleTimer);
-  aim = [e.clientX / innerWidth, e.clientY / innerHeight];
+  aim = [u, v];
   idleTimer = setTimeout(() => {
     aim = null;
     i = SPOTS.reduce((b, p, k) => Math.hypot(p[0] - state.u, p[1] - state.v) < Math.hypot(SPOTS[b][0] - state.u, SPOTS[b][1] - state.v) ? k : b, 0);
     go(SPOTS[i]);
   }, IDLE);
+}
+function underFinger(e) {
+  const b = stage.getBoundingClientRect();
+  steer((e.clientX - b.left - img.x) / img.w, (e.clientY - b.top - img.y) / img.h);
+}
+addEventListener("pointermove", e => {
+  if (still) return;
+  if (e.pointerType === "mouse") steer(e.clientX / innerWidth, e.clientY / innerHeight);
+  else if (finger === e.pointerId) underFinger(e);
 }, { passive: true });
+stage.addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" || still) return;
+  finger = e.pointerId;
+  underFinger(e);
+});
+const lift = e => { if (finger === e.pointerId) finger = null; };
+addEventListener("pointerup", lift, { passive: true });
+addEventListener("pointercancel", lift, { passive: true });
 
 function frame(now) {
   if (aim) {

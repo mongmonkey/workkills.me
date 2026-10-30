@@ -137,7 +137,7 @@
       const el = page.cloneNode(true);
       el.querySelectorAll("[id]").forEach(x => x.removeAttribute("id"));
       el.querySelectorAll("video").forEach(x => x.remove()); // 영상은 원본만 재생(자리는 .band가 유지)
-      el.querySelectorAll(".sub, .band").forEach(x => { x.style.visibility = "hidden"; }); // 베기는 큰 글씨에만
+      el.querySelectorAll(".band").forEach(x => { x.style.visibility = "hidden"; }); // 베기는 글씨(큰 글씨·소개 문구)에만
       el.classList.add("half");
       // 원본 페이지와 같은 자리·크기로 놓아 글씨가 위아래로 튀지 않게
       const r = page.getBoundingClientRect();
