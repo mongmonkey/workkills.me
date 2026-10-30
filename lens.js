@@ -6,18 +6,18 @@ const lens = stage.querySelector(".lens");
 const video = lens.querySelector("video");
 const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const RATIO = 2.9;   // 그림 가로:세로
-const LENS = 0.32;   // 렌즈 지름(그림 폭 기준) — 그림 높이(0.345)보다 작아야 그림 밖이 안 보임
+const RATIO = 2.2;   // 그림 가로:세로 — 렌즈보다 충분히 높아야 위아래로도 움직임
+const LENS = 0.32;   // 렌즈 지름(그림 폭 기준)
 const SPOTS = [      // 렌즈 중심, 그림 폭·높이 기준 0~1
-  [0.148, 0.684],    // 왼쪽 망치 든 일꾼
-  [0.491, 0.336],    // 가운데 밸브와 연기
-  [0.695, 0.667],    // 로봇 일꾼 뒷모습
-  [0.854, 0.587],    // 오른쪽 두 일꾼
+  [0.148, 0.585],    // 왼쪽 망치 든 일꾼
+  [0.491, 0.322],    // 가운데 밸브와 연기
+  [0.695, 0.572],    // 로봇 일꾼 뒷모습
+  [0.854, 0.512],    // 오른쪽 두 일꾼
 ];
 const MOVE = 750;    // 옮겨 가는 시간(ms)
 const SHAKE = 0.007; // 옮겨 갈 때 흔들림 크기(그림 폭 기준)
 const FLOAT = 0.006; // 늘 둥둥 떠 있는 움직임 크기(그림 폭 기준)
-const PULSE = 0.024; // 클릭할 때 순간 커지는 만큼 — 렌즈+이 값이 그림 높이(0.345)를 넘지 않게
+const PULSE = 0.09;  // 클릭할 때 순간 커지는 만큼 — 렌즈+이 값이 그림 높이(1/RATIO)를 넘지 않게
 
 let img = { x: 0, y: 0, w: 0, h: 0 };
 let state = { u: SPOTS[0][0], v: SPOTS[0][1], d: LENS, jx: 0, jy: 0 };
