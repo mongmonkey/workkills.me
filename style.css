@@ -16,7 +16,7 @@ body {
 }
 
 .page {
-  min-height: 100svh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   padding: clamp(64px, 7vw, 100px) var(--side) clamp(20px, 3.4vh, 44px);
@@ -26,24 +26,26 @@ body {
 .sub {
   display: flex;
   flex-direction: column;
+  margin-bottom: clamp(20px, 2.2vw, 32px);
   font: 400 clamp(14px, 1.15vw, 19px)/1.3 "EB Garamond", Garamond, Georgia, serif;
   letter-spacing: .01em;
 }
 
-/* 가운데 영상: 알약 모양, 위쪽 남는 공간의 가운데 */
-.band {
-  position: relative;
-  flex: none;
-  width: min(54vw, 100%);
-  aspect-ratio: 4 / 1;
-  margin: auto;
-  border-radius: 999px;
+/* 가운데 무대: 원형 렌즈가 천천히 돌아다니며 뒤에 깔린 영상의 일부만 보여줌(망원경으로 둘러보듯) */
+.band { position: relative; flex: 1; min-height: 200px; }
+.lens {
+  --d: clamp(140px, 15vw, 260px);
+  position: absolute; left: 0; top: 0;
+  width: var(--d); height: var(--d);
+  border-radius: 50%;
   overflow: hidden;
-  background: #2a1d10 url("media/hero.jpg") 50% 28% / cover;
+  background: #2a1d10;
+  will-change: transform;
 }
-.band video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; }
-/* 윤곽 안쪽 그림자: 영상이 둥근 틀 안으로 살짝 들어가 보이게 */
-.band::after {
+/* 영상은 무대 전체 크기로 고정, 렌즈가 움직인 만큼 반대로 밀어 제자리에 둠 (lens.js) */
+.lens video { position: absolute; left: 0; top: 0; display: block; object-fit: cover; will-change: transform; }
+/* 윤곽 안쪽 그림자 */
+.lens::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   box-shadow:
     inset 0 12px 22px -6px rgba(0,0,0,.72),
@@ -51,7 +53,6 @@ body {
     inset 0 0 0 1px rgba(0,0,0,.35),
     inset 0 0 44px rgba(0,0,0,.5);
 }
-@media (max-width: 1024px) { .band { width: 100%; aspect-ratio: 2.6 / 1; } }
 
 .mark {
   padding-top: clamp(20px, 3vw, 44px);
