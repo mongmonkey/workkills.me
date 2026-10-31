@@ -26,7 +26,7 @@ body {
 .sub {
   display: flex;
   flex-direction: column;
-  margin-bottom: clamp(20px, 2.2vw, 32px);
+  margin-bottom: clamp(8px, .9vw, 14px);
   font: 400 clamp(14px, 1.15vw, 19px)/1.3 "EB Garamond", Garamond, Georgia, serif;
   letter-spacing: .01em;
 }
@@ -53,7 +53,7 @@ body {
 }
 
 .mark {
-  padding-top: clamp(20px, 3vw, 44px);
+  padding-top: clamp(10px, 1.4vw, 20px);
   font: 400 100px/0.8 "Gloock", "Times New Roman", serif;
   letter-spacing: -0.035em;
   white-space: nowrap;
