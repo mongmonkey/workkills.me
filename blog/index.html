@@ -1,0 +1,16 @@
+---
+layout: blog
+title: Blog
+---
+<h1 class="b-index-title">Blog</h1>
+<ol class="b-list">
+  {% for post in site.posts %}
+  <li>
+    <a href="{{ post.url }}">
+      <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
+      <strong>{{ post.title }}</strong>
+      {% if post.summary %}<span>{{ post.summary }}</span>{% endif %}
+    </a>
+  </li>
+  {% endfor %}
+</ol>

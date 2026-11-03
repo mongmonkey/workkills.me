@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="{{ page.lang | default: 'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} — {% endif %}Work Kills Me</title>
+  <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | strip_newlines | truncate: 160 }}">
+  <meta property="og:title" content="{{ page.title | default: 'Blog — Work Kills Me' }}">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <meta name="theme-color" content="#f7f7f7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="alternate" type="application/atom+xml" title="Work Kills Me" href="/blog/feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Gloock&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/blog.css">
+</head>
+<body>
+  <header class="b-head">
+    <a class="b-mark" href="/">WORK <span>KILLS</span><i>.</i>ME</a>
+    <a class="b-pill" href="/blog/">Blog</a>
+  </header>
+  <main class="b-main">
+    {{ content }}
+  </main>
+  <footer class="b-foot">
+    <a href="/">workkills.me</a>
+    <a href="/blog/feed.xml">RSS</a>
+    <a href="mailto:human@workkills.me">human@workkills.me</a>
+  </footer>
+  <script data-goatcounter="https://workkills.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

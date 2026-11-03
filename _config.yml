@@ -1,0 +1,10 @@
+title: Work Kills Me
+description: Notes from an independent venture studio based in Berlin, Germany.
+url: https://workkills.me
+permalink: /blog/:year/:month/:day/:title/
+plugins:
+  - jekyll-feed
+feed:
+  path: blog/feed.xml
+exclude:
+  - README.md

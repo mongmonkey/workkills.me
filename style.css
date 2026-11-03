@@ -147,3 +147,20 @@ body::after {
   80% { transform: translate(73px, 11px); }
 }
 @media (prefers-reduced-motion: reduce) { body::after { animation: none; } }
+
+/* 왼쪽 위 블로그 링크 — SOS와 같은 알약 모양 */
+.blog-link {
+  position: fixed;
+  top: clamp(16px, 2.4vw, 32px);
+  left: var(--side);
+  z-index: 20;
+  padding: 6px 14px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font: 400 14px/1 "EB Garamond", Garamond, Georgia, serif;
+  letter-spacing: .02em;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background .2s, color .2s;
+}
+.blog-link:hover, .blog-link:focus-visible { background: var(--ink); color: var(--bg); outline: none; }
