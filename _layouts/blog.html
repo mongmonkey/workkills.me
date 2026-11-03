@@ -27,6 +27,7 @@
     <a href="/">workkills.me</a>
     <a href="/blog/feed.xml">RSS</a>
     <a href="mailto:human@workkills.me">human@workkills.me</a>
+    <span class="b-admin">{% if page.path contains '_posts/' %}<a href="https://app.pagescms.org/mongmonkey/workkills.me/main/collection/posts/edit/{{ page.path | url_encode }}">Edit this post</a>{% endif %}<a href="https://app.pagescms.org/mongmonkey/workkills.me/main/collection/posts/new">Write</a></span>
   </footer>
   <script data-goatcounter="https://workkills.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>

@@ -1,0 +1,28 @@
+# Pages CMS(app.pagescms.org) 글쓰기 설정
+media:
+  input: media/blog
+  output: /media/blog
+content:
+  - name: posts
+    label: Blog posts
+    type: collection
+    path: _posts
+    filename:
+      template: "{year}-{month}-{day}-{primary}.md"
+      field: create
+    view:
+      fields: [title, summary]
+      primary: title
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: summary
+        label: Summary (one line, shown in the list)
+        type: string
+      - name: body
+        label: Body
+        type: rich-text
+        options:
+          format: markdown
