@@ -87,4 +87,3 @@ a { color: inherit; }
 }
 .b-foot a { text-decoration: none; }
 .b-foot a:hover { color: var(--red); }
-.b-admin { margin-left: auto; display: flex; gap: 24px; }
