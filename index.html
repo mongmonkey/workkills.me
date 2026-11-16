@@ -27,8 +27,15 @@
       <span>Working our way out of work.</span>
       <span>An Independent Venture Studio Based in Berlin, Germany</span>
     </p>
-    <h1 class="mark"><span id="mark">WORK <span class="kills">KILLS</span><span class="dot">.</span>ME</span></h1>
+    <h1 class="mark"><span id="mark">WORK <span class="kills">KILLS</span><span class="dot">.</span><span id="tld">ME</span></span></h1>
   </main>
+  <script>
+    // workkills.ai로 들어오면 이름 끝만 .ai로
+    if (location.hostname.endsWith("workkills.ai")) {
+      document.getElementById("tld").textContent = "AI";
+      document.title = "Work Kills AI";
+    }
+  </script>
   <script src="main.js"></script>
   <script src="slash.js"></script>
   <script src="lens.js"></script>

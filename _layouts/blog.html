@@ -17,17 +17,25 @@
 </head>
 <body>
   <header class="b-head">
-    <a class="b-mark" href="/">WORK <span>KILLS</span><i>.</i>ME</a>
+    <a class="b-mark" href="/">WORK <span>KILLS</span><i>.</i><b id="tld">ME</b></a>
     <a class="b-pill" href="/blog/">Blog</a>
   </header>
   <main class="b-main">
     {{ content }}
   </main>
   <footer class="b-foot">
-    <a href="/">workkills.me</a>
+    <a href="/" id="home-link">workkills.me</a>
     <a href="/blog/feed.xml">RSS</a>
     <a href="mailto:human@workkills.me">human@workkills.me</a>
   </footer>
+  <script>
+    // workkills.ai로 들어오면 이름 끝만 .ai로
+    if (location.hostname.endsWith("workkills.ai")) {
+      document.getElementById("tld").textContent = "AI";
+      document.getElementById("home-link").textContent = "workkills.ai";
+      document.title = document.title.replace("Work Kills Me", "Work Kills AI");
+    }
+  </script>
   <script data-goatcounter="https://workkills.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
