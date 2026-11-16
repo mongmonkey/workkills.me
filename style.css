@@ -16,6 +16,7 @@ body {
 }
 
 .page {
+  height: 100vh; /* svh를 모르는 앱 안 브라우저용 */
   height: 100svh;
   display: flex;
   flex-direction: column;
